@@ -132,23 +132,40 @@ ${p.ver ? chip(406 - K.width("V" + p.ver, 12, 600, { mono: true, ls: 1 }) - 28, 
 
 // Шапка в стиле neofetch: пиксельный персонаж с кофе слева, строки «ключ ..... значение» справа
 const PIX = {
-  H: "#211918", h: "#483531", K: "#332623",
-  S: "#e0ad8d", s: "#b77f65", p: "#aa6b62", A: "#513731", E: "#322522", R: "#f4e2d8",
+  H: "#211918", h: "#58413a", K: "#3b2b28",
+  S: "#dfaa8b", s: "#af765e", V: "#efbb9d", p: "#a76b60", L: "#bd8278", A: "#513731", E: "#322522", R: "#f4e2d8",
   W: "#151518", w: "#2b2b30", J: "#202125", j: "#111215", d: "#383a40",
-  M: "#e4e1da", m: "#b7b1a8", C: "#704729", B: "#18191c", b: "#696a6e",
+  F: "#dfaa8b", f: "#af765e", M: "#e4e1da", m: "#b7b1a8", C: "#704729", B: "#18191c", b: "#696a6e",
 };
 function character(x0, y0, px) {
-  let out = "";
+  let body = "", head = "", eyes = "", lids = "", arm = "";
+  const rect = (x, y, w, h, fill) =>
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}"/>`;
   fs.readFileSync("hero-char.txt", "utf8").trimEnd().split(/\r?\n/).forEach((row, y) => {
     for (let x = 0; x < row.length; ) {
       const c = row[x];
       let n = 1;
       while (row[x + n] === c) n++;
-      if (c !== ".") out += `<rect${c === "E" ? ' class="eye"' : ""} x="${x0 + x * px}" y="${y0 + y * px}" width="${n * px}" height="${px}" fill="${PIX[c]}"/>`;
+      const left = x0 + x * px, top = y0 + y * px;
+      if (c === "E" || c === "R") {
+        head += rect(left, top, n * px, px, PIX.S);
+        eyes += rect(left, top, n * px, px, PIX[c]);
+        if (c === "E") lids += rect(left, top + 3, n * px, 2, PIX.A);
+      } else if ("MmCFf".includes(c)) {
+        arm += rect(left, top, n * px, px, PIX[c]);
+      } else if (c !== ".") {
+        const run = rect(left, top, n * px, px, PIX[c]);
+        if (y < 23) head += run;
+        else body += run;
+      }
       x += n;
     }
   });
-  return out;
+  const steam = [0, 1, 2].map((puff) =>
+    `<path class="portrait-steam steam-${puff}" d="M${x0 + (25 + puff) * px} ${y0 + 19 * px}h6v-6h6v6h-6v6h-6z"/>`
+  ).join("");
+  return `<g class="portrait-head">${head}<g class="portrait-eyes">${eyes}</g><g class="portrait-lids">${lids}</g></g>
+${body}<g class="portrait-cup">${arm}${steam}</g>`;
 }
 const gh = (...a) => execFileSync("gh", ["api", ...a], { encoding: "utf8" }).trim();
 const STATS = (() => {
@@ -178,14 +195,29 @@ function heroNeo() {
   const { width, fitText, delay, svg } = K;
   const H = 64 + INFO.reduce((n, r) => n + (r[0] === "-" ? 12 : r[0] === "#" ? 33 : 21), 0) - 9 + 36, X0 = 296, X1 = 840, SZ = 13, STEP = 21, PX = 6;
   const hi = "#784b18", sub = "#42424a";
-  let b = `<style>.eye{transform-box:fill-box;transform-origin:center;animation:eyeb 5s infinite}.st{fill:#85828a;opacity:0;animation:steam 3.2s ease-out infinite}.s2{animation-delay:1s}.s3{animation-delay:2s}.bob{animation:bob 3.2s ease-in-out infinite}
-@keyframes eyeb{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}@keyframes steam{0%{opacity:0;transform:translate(0,0)}20%{opacity:.8}100%{opacity:0;transform:translate(6px,-44px)}}@keyframes bob{50%{transform:translateY(3px)}}
-@media (prefers-reduced-motion:reduce){.eye,.st,.bob{animation:none}.st{opacity:.5}}</style>`;
-  const cx = 42, cy = 84; // персонаж 32×46 клеток
+  let b = `<style>
+.portrait-head,.portrait-cup{transform-box:fill-box;animation-duration:8s;animation-iteration-count:infinite;animation-timing-function:ease-in-out}
+.portrait-head{transform-origin:50% 90%;animation-name:portrait-nod}
+.portrait-cup{transform-origin:0 86%;animation-name:portrait-toast}
+.portrait-eyes,.portrait-lids{animation:portrait-blink 7s step-end infinite}
+.portrait-lids{opacity:0;animation-name:portrait-lids}
+.portrait-steam{fill:#77717a;opacity:0;animation:portrait-steam 3.2s linear infinite}
+.steam-1{animation-delay:-1.1s}.steam-2{animation-delay:-2.2s}
+.portrait-caret{animation:portrait-caret .55s step-end 3}
+@keyframes portrait-blink{0%,43%,84%{opacity:1}41%,82%{opacity:0}}
+@keyframes portrait-lids{0%,43%,84%{opacity:0}41%,82%{opacity:1}}
+@keyframes portrait-nod{0%,25%,69%,100%{transform:rotate(0deg)}39%,51%{transform:rotate(2deg)}82%{transform:rotate(-1deg)}}
+@keyframes portrait-toast{0%,25%,69%,100%{transform:rotate(0deg)}40%,51%{transform:translateY(-2px) rotate(-7deg)}}
+@keyframes portrait-steam{0%,100%{opacity:0}18%{opacity:.55}100%{transform:translate(6px,-30px)}}
+@keyframes portrait-caret{50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){
+  .portrait-head,.portrait-cup,.portrait-eyes,.portrait-lids,.portrait-steam,.portrait-caret{animation:none}
+  .steam-0{opacity:.35}
+}
+</style>`;
+  const cx = 42, cy = 84;
   b += `<ellipse cx="${cx + 14.5 * PX}" cy="${cy + 46 * PX + 8}" rx="${10 * PX}" ry="9" fill="#000" fill-opacity=".10"/>`;
-  b += `<g shape-rendering="crispEdges" class="r"><g class="bob">${character(cx, cy, PX)}</g>`;
-  const mx = cx + 24 * PX, my = cy + 20 * PX; // верх кружки
-  b += [[mx, my - 12, ""], [mx + 12, my - 20, "s2"], [mx + 6, my - 8, "s3"]].map(([x, y, c]) => `<rect class="st ${c}" x="${x}" y="${y}" width="${PX}" height="${PX}"/>`).join("") + `</g>`;
+  b += `<g shape-rendering="crispEdges" class="r">${character(cx, cy, PX)}</g>`;
   b += `<rect x="268" y="40" width="1" height="${H - 80}" fill="#e2e2e6"/>`;
   let y = 64, i = 0;
   for (const [k, v, em] of INFO) {
@@ -194,7 +226,9 @@ function heroNeo() {
     if (k === "#") {
       if (y > 64) y += 12;
       const w = width(v, SZ, 800, { mono: true });
-      b += `<g class="r" ${d}>${fitText(X0, y, v, 400, { size: SZ, weight: 800, mono: true, fill: hi })}<line x1="${(X0 + w + 12).toFixed(1)}" y1="${y - 4}" x2="${X1}" y2="${y - 4}" stroke="${hi}" stroke-opacity=".28"/></g>`;
+      const title = i === 1;
+      const caret = title ? `<rect class="portrait-caret" x="${(X0 + w + 5).toFixed(1)}" y="${y - 9}" width="2" height="10" fill="${hi}" opacity=".65"/>` : "";
+      b += `<g class="r" ${d}>${fitText(X0, y, v, 400, { size: SZ, weight: 800, mono: true, fill: hi })}${caret}<line x1="${(X0 + w + (title ? 16 : 12)).toFixed(1)}" y1="${y - 4}" x2="${X1}" y2="${y - 4}" stroke="${hi}" stroke-opacity=".28"/></g>`;
     } else {
       const kw = width(k, SZ, 600, { mono: true }), vw = width(v, SZ, 500, { mono: true });
       b += `<g class="r" ${d}>${fitText(X0, y, k, 200, { size: SZ, weight: 600, mono: true, fill: sub })}${fitText(X1, y, v, 400, { size: SZ, weight: em ? 700 : 500, mono: true, fill: em ? hi : "#202024", anchor: "end" })}<line x1="${(X0 + kw + 10).toFixed(1)}" y1="${y - 3}" x2="${(X1 - vw - 10).toFixed(1)}" y2="${y - 3}" stroke="#c3c3c9" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="0.1 5"/></g>`;
