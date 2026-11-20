@@ -127,15 +127,17 @@ ${fontCss(fg, fm)}
 <clipPath id="clip"><rect width="${w}" height="${h}" rx="24"/></clipPath>
 </defs>`;
 
-  const frame = (w, h) => `<g clip-path="url(#clip)"><rect width="${w}" height="${h}" fill="url(#bg)"/>
+  const frame = (w, h, light) => light
+    ? `<rect x=".5" y=".5" width="${w - 1}" height="${h - 1}" rx="24" fill="#fff" stroke="#e2e2e6"/>`
+    : `<g clip-path="url(#clip)"><rect width="${w}" height="${h}" fill="url(#bg)"/>
 <circle class="glow" cx="${w * 0.82}" cy="${Math.min(h * 0.2, 120)}" r="${Math.min(h * 0.7, 340)}" fill="url(#g1)"/>
 <circle class="glow2" cx="${w * 0.1}" cy="${h * 0.95}" r="${Math.min(h * 0.6, 300)}" fill="url(#g2)"/>
 <rect class="sweep" x="0" y="0" width="${w * 0.35}" height="${h}" fill="url(#sw)"/></g>
 <rect x=".5" y=".5" width="${w - 1}" height="${h - 1}" rx="24" fill="none" stroke="#242424"/>`;
 
   /** Плашка: возвращает функцию (fg, fm) → SVG. extraDefs — свои градиенты и клипы. */
-  const svg = (w, h, label, body, extraDefs = '') => (fg, fm) =>
-    `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(plain(label))}">\n${style(fg, fm)}\n${defs(w, h)}${extraDefs ? `\n<defs>${extraDefs}</defs>` : ''}\n${frame(w, h)}\n${body}\n</svg>\n`;
+  const svg = (w, h, label, body, extraDefs = '', { light = false } = {}) => (fg, fm) =>
+    `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(plain(label))}">\n${style(fg, fm)}\n${defs(w, h)}${extraDefs ? `\n<defs>${extraDefs}</defs>` : ''}\n${frame(w, h, light)}\n${body}\n</svg>\n`;
 
   const delay = (i) => `style="animation-delay:${(i * 0.09).toFixed(2)}s"`;
 

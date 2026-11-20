@@ -131,7 +131,12 @@ ${p.ver ? chip(406 - K.width("V" + p.ver, 12, 600, { mono: true, ls: 1 }) - 28, 
 }
 
 // Шапка в стиле neofetch: пиксельный персонаж с кофе слева, строки «ключ ..... значение» справа
-const PIX = { H: "#2a1a12", h: "#4d3224", S: "#f1c6a0", s: "#d9a47c", p: "#e99a8a", E: "#161616", W: "#463d38", w: "#2c2622", M: "#f2f4ef", m: "#c4c9bd", C: "#6b3f22", J: "#3d5a8a", j: "#2d4468", B: "#e8ebe4", b: "#a3aa9c" };
+const PIX = {
+  H: "#211918", h: "#483531", K: "#332623",
+  S: "#e0ad8d", s: "#b77f65", p: "#aa6b62", A: "#513731", E: "#322522", R: "#f4e2d8",
+  W: "#151518", w: "#2b2b30", J: "#202125", j: "#111215", d: "#383a40",
+  M: "#e4e1da", m: "#b7b1a8", C: "#704729", B: "#18191c", b: "#696a6e",
+};
 function character(x0, y0, px) {
   let out = "";
   fs.readFileSync("hero-char.txt", "utf8").trimEnd().split(/\r?\n/).forEach((row, y) => {
@@ -171,17 +176,17 @@ const INFO = [
 function heroNeo() {
   const K = kit("#F2B84B");
   const { width, fitText, delay, svg } = K;
-  const H = 64 + INFO.reduce((n, r) => n + (r[0] === "-" ? 12 : r[0] === "#" ? 33 : 21), 0) - 9 + 36, X0 = 296, X1 = 840, SZ = 13, STEP = 21, PX = 8;
-  const hi = K.A.hi, sub = mix(hi, "#FFFFFF", 0.35);
-  let b = `<style>.eye{transform-box:fill-box;transform-origin:center;animation:eyeb 5s infinite}.st{fill:#cfd4c8;opacity:0;animation:steam 3.2s ease-out infinite}.s2{animation-delay:1s}.s3{animation-delay:2s}.bob{animation:bob 3.2s ease-in-out infinite}
+  const H = 64 + INFO.reduce((n, r) => n + (r[0] === "-" ? 12 : r[0] === "#" ? 33 : 21), 0) - 9 + 36, X0 = 296, X1 = 840, SZ = 13, STEP = 21, PX = 6;
+  const hi = "#784b18", sub = "#42424a";
+  let b = `<style>.eye{transform-box:fill-box;transform-origin:center;animation:eyeb 5s infinite}.st{fill:#85828a;opacity:0;animation:steam 3.2s ease-out infinite}.s2{animation-delay:1s}.s3{animation-delay:2s}.bob{animation:bob 3.2s ease-in-out infinite}
 @keyframes eyeb{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}@keyframes steam{0%{opacity:0;transform:translate(0,0)}20%{opacity:.8}100%{opacity:0;transform:translate(6px,-44px)}}@keyframes bob{50%{transform:translateY(3px)}}
 @media (prefers-reduced-motion:reduce){.eye,.st,.bob{animation:none}.st{opacity:.5}}</style>`;
-  const cx = 40, cy = 84; // персонаж 24×36 клеток
-  b += `<ellipse cx="${cx + 12 * PX}" cy="${cy + 36 * PX + 8}" rx="${10 * PX}" ry="9" fill="#000" fill-opacity=".55"/>`;
+  const cx = 42, cy = 84; // персонаж 32×46 клеток
+  b += `<ellipse cx="${cx + 14.5 * PX}" cy="${cy + 46 * PX + 8}" rx="${10 * PX}" ry="9" fill="#000" fill-opacity=".10"/>`;
   b += `<g shape-rendering="crispEdges" class="r"><g class="bob">${character(cx, cy, PX)}</g>`;
-  const mx = cx + 16 * PX, my = cy + 10 * PX; // кружка: колонки 16–21, ряд 10
-  b += [[mx + 24, my - 12, ""], [mx + 40, my - 20, "s2"], [mx + 32, my - 8, "s3"]].map(([x, y, c]) => `<rect class="st ${c}" x="${x}" y="${y}" width="${PX}" height="${PX}"/>`).join("") + `</g>`;
-  b += `<rect x="268" y="40" width="1" height="${H - 80}" fill="#fff" fill-opacity=".09"/>`;
+  const mx = cx + 24 * PX, my = cy + 20 * PX; // верх кружки
+  b += [[mx, my - 12, ""], [mx + 12, my - 20, "s2"], [mx + 6, my - 8, "s3"]].map(([x, y, c]) => `<rect class="st ${c}" x="${x}" y="${y}" width="${PX}" height="${PX}"/>`).join("") + `</g>`;
+  b += `<rect x="268" y="40" width="1" height="${H - 80}" fill="#e2e2e6"/>`;
   let y = 64, i = 0;
   for (const [k, v, em] of INFO) {
     if (k === "-") { y += 12; continue; }
@@ -192,12 +197,11 @@ function heroNeo() {
       b += `<g class="r" ${d}>${fitText(X0, y, v, 400, { size: SZ, weight: 800, mono: true, fill: hi })}<line x1="${(X0 + w + 12).toFixed(1)}" y1="${y - 4}" x2="${X1}" y2="${y - 4}" stroke="${hi}" stroke-opacity=".28"/></g>`;
     } else {
       const kw = width(k, SZ, 600, { mono: true }), vw = width(v, SZ, 500, { mono: true });
-      b += `<g class="r" ${d}>${fitText(X0, y, k, 200, { size: SZ, weight: 600, mono: true, fill: sub })}${fitText(X1, y, v, 400, { size: SZ, weight: em ? 700 : 500, mono: true, fill: em ? hi : "#FFFFFF", anchor: "end" })}<line x1="${(X0 + kw + 10).toFixed(1)}" y1="${y - 3}" x2="${(X1 - vw - 10).toFixed(1)}" y2="${y - 3}" stroke="#4a4a4a" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="0.1 5"/></g>`;
+      b += `<g class="r" ${d}>${fitText(X0, y, k, 200, { size: SZ, weight: 600, mono: true, fill: sub })}${fitText(X1, y, v, 400, { size: SZ, weight: em ? 700 : 500, mono: true, fill: em ? hi : "#202024", anchor: "end" })}<line x1="${(X0 + kw + 10).toFixed(1)}" y1="${y - 3}" x2="${(X1 - vw - 10).toFixed(1)}" y2="${y - 3}" stroke="#c3c3c9" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="0.1 5"/></g>`;
     }
     y += STEP;
   }
-  const tint = `<rect width="880" height="${H}" rx="24" fill="${hi}" fill-opacity=".05"/><rect x=".5" y=".5" width="879" height="${H - 1}" rx="24" fill="none" stroke="${hi}" stroke-opacity=".25"/>`;
-  return svg(880, H, "vlad@sailxx: Vlad, 16 y/o founder from Russia. AI bots, Android apps and minimal tools. Runs on coffee.", tint + b);
+  return svg(880, H, "vlad@sailxx: Vlad, 16 y/o founder from Russia. AI bots, Android apps and minimal tools. Runs on coffee.", b, "", { light: true });
 }
 
 // Изометрическая сетка: weeks — колонки по 7 дней {weekday, contributionCount}; shade — 5 цветов от пустого к максимуму
@@ -275,7 +279,7 @@ function contribSvg() {
   const { T, fitText, delay, svg, card, width } = K;
   const { weeks, total } = contribData();
   const days = weeks.flat();
-  const hi = K.A.hi, sub = mix(hi, "#FFFFFF", 0.35);
+  const hi = "#784b18", sub = "#42424a";
   const max = Math.max(...days.map((d) => d.contributionCount), 1); // для Best day
   const best = days.reduce((a, d) => (d.contributionCount > a.contributionCount ? d : a), days[0]);
   const last7 = days.slice(-7).reduce((s, d) => s + d.contributionCount, 0);
