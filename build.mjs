@@ -176,17 +176,18 @@ const STATS = (() => {
     return [String(repos), String(stars), String(commits)];
   } catch { return ["17", "15", "607"]; }
 })();
+const LEET_USER = "sailixx";
 const INFO = [
   ["#", "vlad@sailxx"],
-  ["OS", "Windows 11, Fedora Linux"], ["Uptime", "16 years"], ["Host", "Founder @ sailxx"], ["IDE", "VS Code, Android Studio"], ["Fuel", "coffee, then code"],
+  ["OS", "Windows 11, Fedora Linux"], ["IDE", "VS Code, Android Studio"],
   ["-"],
   ["Languages.Programming", "JavaScript, TypeScript, Kotlin, C#"], ["Languages.Computer", "HTML, CSS, JSON, SVG"], ["Languages.Real", "Russian, English, Italian"],
   ["-"],
   ["Hobbies.Software", "UI design, games"], ["Hobbies.Hardware", "PC building"],
   ["#", "Projects"],
-  ["Now", "FITTER 3.0"], ["Also", "Okto, Okto Notes, TrayMixer, Budila, Flipt, Ember"],
+  ["Featured", "Tobi, TrayMixer, Lumen, Okto"],
   ["#", "Contact"],
-  ["Telegram", "@arkhitkovv", true], ["GitHub", "github.com/sailxx"], ["LeetCode", "u/qXESYLd6R6"],
+  ["Telegram", "@arkhitkovv", true], ["LeetCode", "@" + LEET_USER],
   ["#", "GitHub Stats"],
   ["Repos", STATS[0]], ["Stars", STATS[1]], ["Commits", STATS[2]],
 ];
@@ -235,7 +236,7 @@ ${autoplay ? "" : `@media (prefers-reduced-motion:reduce){
     }
     y += STEP;
   }
-  return svg(880, H, "vlad@sailxx: Vlad, 16 y/o founder from Russia. AI bots, Android apps and minimal tools. Runs on coffee.", b, "", { light: true });
+  return svg(880, H, "Vlad (sailxx) — developer profile, projects, and contact information.", b, "", { light: true });
 }
 
 // Изометрическая сетка: weeks — колонки по 7 дней {weekday, contributionCount}; shade — 5 цветов от пустого к максимуму
@@ -354,7 +355,6 @@ function footer(color, mode) {
 const CARD = { pill: "accent", chev: true, tint: true, name: true };
 const HERO = { glow: true, tint: true, rainbow: true };
 fs.mkdirSync(OUT, { recursive: true });
-const LEET_USER = "qXESYLd6R6";
 const LEET = await leetData(LEET_USER).catch((e) => (console.warn("leetcode: пропущено,", e.message), null));
 const jobs = [["hero.svg", () => heroNeo(), "#F2B84B"], ["hero-motion.svg", () => heroNeo({ autoplay: true }), "#F2B84B"], ...P.map((p) => [`${p.id}.svg`, () => cardE(p, CARD), p.color]), ["contrib.svg", () => contribSvg(), "#F2B84B"], ...(LEET ? [["leetcode.svg", () => leetSvg(LEET, LEET_USER), "#FFA116"]] : [])];
 for (const [name, render, color] of jobs) await kit(color).build(OUT, { [name]: () => ({ [name]: render() }) });
