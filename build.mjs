@@ -190,7 +190,7 @@ const INFO = [
   ["#", "GitHub Stats"],
   ["Repos", STATS[0]], ["Stars", STATS[1]], ["Commits", STATS[2]],
 ];
-function heroNeo() {
+function heroNeo({ autoplay = false } = {}) {
   const K = kit("#F2B84B");
   const { width, fitText, delay, svg } = K;
   const H = 64 + INFO.reduce((n, r) => n + (r[0] === "-" ? 12 : r[0] === "#" ? 33 : 21), 0) - 9 + 36, X0 = 296, X1 = 840, SZ = 13, STEP = 21, PX = 6;
@@ -204,16 +204,16 @@ function heroNeo() {
 .portrait-steam{fill:#77717a;opacity:0;animation:portrait-steam 3.2s linear infinite}
 .steam-1{animation-delay:-1.1s}.steam-2{animation-delay:-2.2s}
 .portrait-caret{animation:portrait-caret .55s step-end 3}
-@keyframes portrait-blink{0%,43%,84%{opacity:1}41%,82%{opacity:0}}
-@keyframes portrait-lids{0%,43%,84%{opacity:0}41%,82%{opacity:1}}
-@keyframes portrait-nod{0%,25%,69%,100%{transform:rotate(0deg)}39%,51%{transform:rotate(2deg)}82%{transform:rotate(-1deg)}}
-@keyframes portrait-toast{0%,25%,69%,100%{transform:rotate(0deg)}40%,51%{transform:translateY(-2px) rotate(-7deg)}}
-@keyframes portrait-steam{0%,100%{opacity:0}18%{opacity:.55}100%{transform:translate(6px,-30px)}}
+@keyframes portrait-blink{0%,22%,76%{opacity:1}19%,73%{opacity:0}}
+@keyframes portrait-lids{0%,22%,76%{opacity:0}19%,73%{opacity:1}}
+@keyframes portrait-nod{0%,7%,51%,100%{transform:rotate(0deg)}23%,36%{transform:rotate(3deg)}75%{transform:rotate(-1deg)}}
+@keyframes portrait-toast{0%,7%,51%,100%{transform:rotate(0deg)}23%,35%{transform:translateY(-4px) rotate(-12deg)}}
+@keyframes portrait-steam{0%,100%{opacity:0}18%{opacity:.72}100%{transform:translate(9px,-36px)}}
 @keyframes portrait-caret{50%{opacity:0}}
-@media (prefers-reduced-motion:reduce){
+${autoplay ? "" : `@media (prefers-reduced-motion:reduce){
   .portrait-head,.portrait-cup,.portrait-eyes,.portrait-lids,.portrait-steam,.portrait-caret{animation:none}
   .steam-0{opacity:.35}
-}
+}`}
 </style>`;
   const cx = 42, cy = 84;
   b += `<ellipse cx="${cx + 14.5 * PX}" cy="${cy + 46 * PX + 8}" rx="${10 * PX}" ry="9" fill="#000" fill-opacity=".10"/>`;
@@ -356,7 +356,7 @@ const HERO = { glow: true, tint: true, rainbow: true };
 fs.mkdirSync(OUT, { recursive: true });
 const LEET_USER = "qXESYLd6R6";
 const LEET = await leetData(LEET_USER).catch((e) => (console.warn("leetcode: пропущено,", e.message), null));
-const jobs = [["hero.svg", () => heroNeo(), "#F2B84B"], ...P.map((p) => [`${p.id}.svg`, () => cardE(p, CARD), p.color]), ["contrib.svg", () => contribSvg(), "#F2B84B"], ...(LEET ? [["leetcode.svg", () => leetSvg(LEET, LEET_USER), "#FFA116"]] : [])];
+const jobs = [["hero.svg", () => heroNeo(), "#F2B84B"], ["hero-motion.svg", () => heroNeo({ autoplay: true }), "#F2B84B"], ...P.map((p) => [`${p.id}.svg`, () => cardE(p, CARD), p.color]), ["contrib.svg", () => contribSvg(), "#F2B84B"], ...(LEET ? [["leetcode.svg", () => leetSvg(LEET, LEET_USER), "#FFA116"]] : [])];
 for (const [name, render, color] of jobs) await kit(color).build(OUT, { [name]: () => ({ [name]: render() }) });
 console.log(`логотипов: ${buildLogos(OUT + "/logos", LOGOS)}`);
 console.log(`${jobs.length} файлов → ${OUT}`);
